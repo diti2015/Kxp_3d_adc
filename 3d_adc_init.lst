@@ -1,0 +1,127 @@
+C51 COMPILER V9.51   3D_ADC_INIT                                                           01/27/2015 10:06:44 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE 3D_ADC_INIT
+OBJECT MODULE PLACED IN .\output\3d_adc_init.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE src\3d_adc_init.c BROWSE DEBUG OBJECTEXTEND PRINT(.\3d_adc_init.lst) TABS(2
+                    -) OBJECT(.\output\3d_adc_init.obj)
+
+line level    source
+
+   1          /*
+   2           * Copyright (C) 2006 LIQING CO.,LTD
+   3          */
+   4          
+   5          #include <c8051f350.h>
+   6          #include "3d_adc_init.h"
+   7          #include "3d_adc_adc.h"
+   8          
+   9          #define FLBYTE      0x1DFF
+  10          
+  11          void ADCInital(void)
+  12          {
+  13   1        ADC0MD = 0x00;
+  14   1        ADC0DEC = 0x1FF;
+  15   1      
+  16   1        ADC0CN = 0x17;
+  17   1        ADC0CF = 0x00;
+  18   1      
+  19   1        ADC0MUX = CHX;
+  20   1        ADC0MD = 0x81;
+  21   1        ADC0MD = 0x82;
+  22   1      } 
+  23          
+  24          // Peripheral specific initialization functions,
+  25          // Called from the Init_Device() function
+  26          void PCA_Init()
+  27          {
+  28   1          PCA0MD    &= ~0x40;
+  29   1          PCA0MD    = 0x00;
+  30   1      }
+  31          
+  32          void Timer_Init()
+  33          {
+  34   1          TCON      = 0x40;
+  35   1          TMOD      = 0x20;
+  36   1          CKCON     = 0x08;
+  37   1          TH1       = 0x60;
+  38   1      }
+  39          
+  40          void UART_Init()
+  41          {
+  42   1          SCON0     = 0x10;
+  43   1      }
+  44          
+  45          void Port_IO_Init()
+  46          {
+  47   1        P0MDOUT   = 0x0F;  
+  48   1        P1MDOUT   = 0x04;
+  49   1          P0SKIP    = 0xC0;
+  50   1          P1SKIP    = 0xFB;
+  51   1          XBR0      = 0x03;
+  52   1          XBR1      = 0x40;
+  53   1      }
+  54          
+C51 COMPILER V9.51   3D_ADC_INIT                                                           01/27/2015 10:06:44 PAGE 2   
+
+  55          void SPI_Init()
+  56          {
+  57   1          SPI0CFG   = 0x40;
+  58   1          SPI0CN    = 0x01;    
+  59   1          SPI0CKR   = 0x04;    
+  60   1      }
+  61          
+  62          void Oscillator_Init()
+  63          {
+  64   1       //   OSCICN    = 0x83;
+  65   1      }
+  66          
+  67          void Interrupts_Init()
+  68          {
+  69   1          IP        = 0x40;
+  70   1          EIE1      = 0x08;
+  71   1          IE        = 0xd0;
+  72   1      }
+  73          
+  74          
+  75           void FLASH_LOCK(void)
+  76          {   
+  77   1        unsigned char xdata * data fp;
+  78   1        VDM0CN = 0x80;
+  79   1        PSCTL = 0x01;
+  80   1        fp = FLBYTE;
+  81   1        FLKEY =0xA5;
+  82   1        FLKEY =0xF1;
+  83   1        *fp = 0xFF; 
+  84   1        PSCTL  =0;  
+  85   1      }
+  86          
+  87          // Initialization function for device,
+  88          // Call Init_Device() from your main program
+  89          void Init_Device(void)
+  90          {
+  91   1        PCA_Init();  
+  92   1        
+  93   1          Timer_Init();
+  94   1          UART_Init();
+  95   1          Port_IO_Init();
+  96   1        FLASH_LOCK();
+  97   1        SPI_Init();
+  98   1          Oscillator_Init();
+  99   1          Interrupts_Init();
+ 100   1        ADCInital();  
+ 101   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    137    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

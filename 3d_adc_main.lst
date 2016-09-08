@@ -1,0 +1,119 @@
+C51 COMPILER V9.51   3D_ADC_MAIN                                                           01/27/2015 10:06:44 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE 3D_ADC_MAIN
+OBJECT MODULE PLACED IN .\output\3d_adc_main.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE src\3d_adc_main.c BROWSE DEBUG OBJECTEXTEND PRINT(.\3d_adc_main.lst) TABS(2
+                    -) OBJECT(.\output\3d_adc_main.obj)
+
+line level    source
+
+   1          /*
+   2           * Copyright (C) 2006 LIQING CO.,LTD
+   3           *  
+   4          */
+   5          
+   6          #include <stdio.h>
+   7          #include <c8051f350.h>
+   8          #include <math.h>
+   9          #define OS_GLOBALS
+  10          #include "3d_adc_stucts.h"
+  11          #undef  OS_GLOBALS
+  12          #include "3d_adc_pin.h"
+  13          #include "3d_adc_init.h"
+  14          #include "3d_adc_uart.h"
+  15          #include "3d_adc_adc.h"
+  16          #include "3d_adc_spi.h"
+  17          
+  18          unsigned char idata lc;
+  19          long averagefilter(long * buffer,unsigned char * len,long compassdata,int  filter,long *filtdata)
+  20          {
+  21   1        unsigned char idata tmplen;
+  22   1        long idata redata;
+  23   1        unsigned char idata tlen;
+  24   1        tlen = *len;
+  25   1        
+  26   1        redata = compassdata - *(buffer+tlen);
+  27   1        if(redata < 0) redata = -redata;
+  28   1      
+  29   1        if((redata > filter)  || (*filtdata == 0))
+  30   1        {
+  31   2          for(tmplen=0;tmplen<lc;tmplen++)
+  32   2          {
+  33   3            *(buffer+tmplen) = compassdata;
+  34   3          }
+  35   2          *filtdata = compassdata*lc;
+  36   2          tlen = 0;
+  37   2          redata = compassdata;
+  38   2        }
+  39   1        else
+  40   1        {   
+  41   2          if(tlen >= lc-1)  tlen = 0;
+  42   2          else tlen++;    
+  43   2          *filtdata = *filtdata - *(buffer+tlen);
+  44   2          *(buffer+tlen) = compassdata;
+  45   2          *filtdata = *filtdata + compassdata;
+  46   2          redata = (long)((float)(*filtdata)/(float)lc);
+  47   2        }
+  48   1       
+  49   1        *len = tlen;
+  50   1      
+  51   1        
+  52   1        return redata;
+  53   1      }
+  54          
+C51 COMPILER V9.51   3D_ADC_MAIN                                                           01/27/2015 10:06:44 PAGE 2   
+
+  55          void main(void)
+  56          { 
+  57   1        Init_Device();
+  58   1        flagadc = 0;
+  59   1      
+  60   1        rdax();
+  61   1        rdai = 0;
+  62   1      
+  63   1        while(1)
+  64   1        {
+  65   2          getrda();
+  66   2          getmag();
+  67   2          if(flagprint == 1)
+  68   2          {        
+  69   3            flagprint = 0;        
+  70   3      
+  71   3            padc = rdayp - 204800;
+  72   3            radc = rdaxp - 204800;  
+  73   3            
+  74   3            tmp = (rdatp/200.0 -197.0)/-1.083;    
+  75   3      
+  76   3            lc = 20;
+  77   3            fpadc = averagefilter(bufp,&lenp,padc,150,&filtdatap);
+  78   3            fradc = averagefilter(bufr,&lenr,radc,150,&filtdatar);
+  79   3            
+  80   3            fpadc = fpadc /6;
+  81   3            fradc = fradc /6;
+  82   3      
+  83   3            fpadc = fpadc + 21845;
+  84   3            fradc = fradc + 21845;
+  85   3       
+  86   3            fmagx = (int)averagefilter(bufx,&lenx,(x0 - x1),150,&filtdatax);
+  87   3            fmagy = (int)averagefilter(bufy,&leny,(y0 - y1),150,&filtdatay);
+  88   3            fmagz = (int)averagefilter(bufz,&lenz,(z0 - z1),150,&filtdataz);
+  89   3         
+  90   3            SendData();
+  91   3          }
+  92   2        }
+  93   1      }        
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    955    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    464    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     23      15
+   IDATA SIZE       =     64       6
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,78 @@
+C51 COMPILER V9.51   3D_ADC_UART                                                           01/27/2015 10:06:43 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE 3D_ADC_UART
+OBJECT MODULE PLACED IN .\output\3d_adc_uart.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE src\3d_adc_uart.c BROWSE DEBUG OBJECTEXTEND PRINT(.\3d_adc_uart.lst) TABS(2
+                    -) OBJECT(.\output\3d_adc_uart.obj)
+
+line level    source
+
+   1           /*
+   2           * Copyright (C) 2006 LIQING CO.,LTD
+   3          */
+   4          
+   5          #include <c8051f350.h>
+   6          #include <string.h>
+   7          #include <stdio.h>
+   8          #include <stdlib.h>
+   9          #include <math.h>
+  10          #include "3d_adc_uart.h"
+  11          #include "3d_adc_stucts.h"
+  12          
+  13          
+  14          void UART0_ISR (void) interrupt 4
+  15          {
+  16   1        if(RI0)
+  17   1        {
+  18   2          RI0 = 0;
+  19   2        }
+  20   1      
+  21   1        if(TI0)
+  22   1        { 
+  23   2          TI0 = 0;
+  24   2          if(UartSendLen > 0) 
+  25   2          {
+  26   3            SBUF0 = UartSendBuf[UartSendCount-UartSendLen];
+  27   3            UartSendLen--;
+  28   3          }   
+  29   2        }
+  30   1      }
+  31          
+  32          void SendData(void)
+  33          {
+  34   1        unsigned char i,j;
+  35   1      
+  36   1        i = sprintf(UartSendBuf,",%6d,%6d,%6d,",fmagx,fmagy,-fmagz);
+  37   1        j = sprintf(UartSendBuf+i,"%6u,%6u,%3d\r\n",(unsigned int)fradc,(unsigned int)fpadc,tmp);
+  38   1      
+  39   1        i = i+j;
+  40   1        Uart_Send(i,'#');
+  41   1      }
+  42          
+  43          //启动串口数据发送
+  44          //输入参数为需要发送的数据的长度
+  45          void Uart_Send(unsigned char SendLen,char class)
+  46          {
+  47   1        UartSendLen = SendLen;
+  48   1        UartSendCount = SendLen;
+  49   1      
+  50   1        TI0 = 0;
+  51   1        SBUF0 = class;  
+  52   1      }
+
+
+C51 COMPILER V9.51   3D_ADC_UART                                                           01/27/2015 10:06:43 PAGE 2   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    192    ----
+   CONSTANT SIZE    =     28    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

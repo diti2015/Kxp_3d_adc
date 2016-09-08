@@ -1,0 +1,71 @@
+C51 COMPILER V9.51   3D_ADC_ADC                                                            01/27/2015 10:06:43 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE 3D_ADC_ADC
+OBJECT MODULE PLACED IN .\output\3d_adc_adc.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE src\3d_adc_adc.c BROWSE DEBUG OBJECTEXTEND PRINT(.\3d_adc_adc.lst) TABS(2) 
+                    -OBJECT(.\output\3d_adc_adc.obj)
+
+line level    source
+
+   1           /*
+   2           * Copyright (C) 2006 LIQING CO.,LTD  
+   3          */
+   4          
+   5          #include <c8051f350.h>
+   6          #include "3d_adc_stucts.h"
+   7          #include "3d_adc_adc.h"
+   8          
+   9          sbit  SET = P1^2;
+  10          
+  11          union
+  12          { 
+  13             unsigned char c[2];
+  14             unsigned int  i;
+  15          }res;
+  16          
+  17          
+  18          void adc0(void) interrupt 10
+  19          {
+  20   1        
+  21   1        AD0INT = 0;
+  22   1      
+  23   1        res.c[0] = ADC0H;
+  24   1        res.c[1] = ADC0M;
+  25   1      
+  26   1        adcmag = res.i;
+  27   1          flagadc = 1;
+  28   1      }
+  29          
+  30          void getmag(void)
+  31          {
+  32   1        if(flagadc == 1)
+  33   1        {
+  34   2          flagadc = 0;
+  35   2      
+  36   2          if(adccho == 0) {SET = 0;x0 = adcmag;adccho = 1;ADC0MUX = CHY;}
+  37   2          else if(adccho == 1) {SET = 0;y0 = adcmag;adccho = 2;ADC0MUX = CHZ;}
+  38   2          else if(adccho == 2) {SET = 1;z0 = adcmag;adccho = 3;ADC0MUX = CHX;}
+  39   2          else if(adccho == 3) {SET = 1;x1 = adcmag;adccho = 4;ADC0MUX = CHY;}
+  40   2          else if(adccho == 4) {SET = 1;y1 = adcmag;adccho = 5;ADC0MUX = CHZ;}
+  41   2          else if(adccho == 5) {SET = 0;flagprint = 1;z1 = adcmag;adccho = 0;ADC0MUX = CHX;}  
+  42   2        
+  43   2          ADC0MD = 0x82;
+  44   2        }
+  45   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    220    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.51   3D_ADC_ADC                                                            01/27/2015 10:06:43 PAGE 2   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

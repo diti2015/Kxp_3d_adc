@@ -1,0 +1,7 @@
+".\output\3d_adc_uart.obj",
+".\output\3d_adc_adc.obj",
+".\output\3d_adc_init.obj",
+".\output\3d_adc_main.obj",
+".\output\3d_adc_spi.obj" 
+TO ".\output\3d_adc_spi_cz" 
+PRINT(".\3d_adc_spi_cz.m51") RAMSIZE(256) 
